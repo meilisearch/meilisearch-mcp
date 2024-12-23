@@ -2,6 +2,7 @@ from typing import Dict, Any, List, Optional
 from meilisearch import Client
 from dataclasses import dataclass
 
+
 @dataclass
 class SearchSettings:
     displayedAttributes: Optional[List[str]] = None
@@ -16,9 +17,10 @@ class SearchSettings:
     faceting: Optional[Dict[str, Any]] = None
     pagination: Optional[Dict[str, Any]] = None
 
+
 class SettingsManager:
     """Manage Meilisearch index settings"""
-    
+
     def __init__(self, client: Client):
         self.client = client
 
@@ -30,7 +32,9 @@ class SettingsManager:
         except Exception as e:
             raise Exception(f"Failed to get settings: {str(e)}")
 
-    async def update_settings(self, index_uid: str, settings: Dict[str, Any]) -> Dict[str, Any]:
+    async def update_settings(
+        self, index_uid: str, settings: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Update settings for an index"""
         try:
             index = self.client.index(index_uid)

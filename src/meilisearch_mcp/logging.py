@@ -8,9 +8,10 @@ import threading
 from queue import Queue
 import asyncio
 
+
 class AsyncLogHandler:
     """Asynchronous log handler with buffering"""
-    
+
     def __init__(self, max_buffer: int = 1000):
         self.buffer = Queue(maxsize=max_buffer)
         self.running = True
@@ -43,9 +44,10 @@ class AsyncLogHandler:
         self.running = False
         self.worker_thread.join()
 
+
 class FileLogHandler(AsyncLogHandler):
     """File-based log handler"""
-    
+
     def __init__(self, log_dir: str):
         super().__init__()
         self.log_dir = Path(log_dir)
@@ -55,24 +57,23 @@ class FileLogHandler(AsyncLogHandler):
 
     def _rotate_file(self):
         """Rotate log file daily"""
-        date_str = datetime.now().strftime('%Y-%m-%d')
+        date_str = datetime.now().strftime("%Y-%m-%d")
         self.current_file = self.log_dir / f"meilisearch-mcp-{date_str}.log"
 
     def _write_log(self, record: Dict[str, Any]):
         """Write log record to file"""
-        current_date = datetime.now().strftime('%Y-%m-%d')
+        current_date = datetime.now().strftime("%Y-%m-%d")
         if not self.current_file or current_date not in self.current_file.name:
             self._rotate_file()
 
-        with open(self.current_file, 'a') as f:
-            f.write(json.dumps(record) + '\n')
+        with open(self.current_file, "a") as f:
+            f.write(json.dumps(record) + "\n")
+
 
 class MCPLogger:
     """Enhanced MCP logger with structured logging"""
-    
-    def __init__(self, 
-                 name: str = "meilisearch-mcp",
-                 log_dir: Optional[str] = None):
+
+    def __init__(self, name: str = "meilisearch-mcp", log_dir: Optional[str] = None):
         self.logger = logging.getLogger(name)
         self._setup_logger(log_dir)
 
@@ -82,7 +83,7 @@ class MCPLogger:
             # Console handler
             console_handler = logging.StreamHandler(sys.stderr)
             formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
             )
             console_handler.setFormatter(formatter)
             self.logger.addHandler(console_handler)
@@ -90,7 +91,7 @@ class MCPLogger:
             # File handler for structured logging
             if log_dir:
                 self.file_handler = FileLogHandler(log_dir)
-            
+
             self.logger.setLevel(logging.INFO)
 
     def _log(self, level: str, msg: str, **kwargs):
@@ -99,14 +100,14 @@ class MCPLogger:
             "timestamp": datetime.utcnow().isoformat(),
             "level": level,
             "message": msg,
-            **kwargs
+            **kwargs,
         }
 
         # Log to console
         getattr(self.logger, level.lower())(msg)
-        
+
         # Log structured data to file
-        if hasattr(self, 'file_handler'):
+        if hasattr(self, "file_handler"):
             self.file_handler.emit(log_entry)
 
     def debug(self, msg: str, **kwargs):
@@ -123,5 +124,5 @@ class MCPLogger:
 
     def shutdown(self):
         """Clean shutdown of logger"""
-        if hasattr(self, 'file_handler'):
+        if hasattr(self, "file_handler"):
             self.file_handler.shutdown()

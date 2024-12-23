@@ -11,11 +11,24 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
 
 [project.scripts]
 meilisearch-mcp = "meilisearch_mcp.server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/meilisearch_mcp"]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]
+testpaths = [
+    "tests"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'

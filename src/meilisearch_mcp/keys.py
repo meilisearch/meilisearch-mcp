@@ -2,15 +2,16 @@ from typing import Dict, Any, List, Optional
 from meilisearch import Client
 from datetime import datetime
 
+
 class KeyManager:
     """Manage Meilisearch API keys"""
-    
+
     def __init__(self, client: Client):
         self.client = client
 
-    async def get_keys(self, 
-                      parameters: Optional[Dict[str, Any]] = None
-                      ) -> Dict[str, Any]:
+    async def get_keys(
+        self, parameters: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Get list of API keys"""
         try:
             return self.client.get_keys(parameters)
@@ -24,19 +25,14 @@ class KeyManager:
         except Exception as e:
             raise Exception(f"Failed to get key: {str(e)}")
 
-    async def create_key(self, 
-                        options: Dict[str, Any]
-                        ) -> Dict[str, Any]:
+    async def create_key(self, options: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new API key"""
         try:
             return self.client.create_key(options)
         except Exception as e:
             raise Exception(f"Failed to create key: {str(e)}")
 
-    async def update_key(self, 
-                        key: str, 
-                        options: Dict[str, Any]
-                        ) -> Dict[str, Any]:
+    async def update_key(self, key: str, options: Dict[str, Any]) -> Dict[str, Any]:
         """Update an existing API key"""
         try:
             return self.client.update_key(key, options)

@@ -13,8 +13,11 @@ from .monitoring import MonitoringManager
 
 logger = MCPLogger()
 
+
 class MeilisearchClient:
-    def __init__(self, url: str = "http://localhost:7700", api_key: Optional[str] = None):
+    def __init__(
+        self, url: str = "http://localhost:7700", api_key: Optional[str] = None
+    ):
         """Initialize Meilisearch client"""
         self.url = url
         self.api_key = api_key
@@ -26,7 +29,7 @@ class MeilisearchClient:
         self.tasks = TaskManager(self.client)
         self.keys = KeyManager(self.client)
         self.monitoring = MonitoringManager(self.client)
-        
+
     async def health_check(self) -> bool:
         """Check if Meilisearch is healthy"""
         try:
@@ -43,23 +46,25 @@ class MeilisearchClient:
         """Get database stats"""
         # return self.client.get_stats()
         return "This method has not yet been implemented in the Meilisearch client."
-    
+
     async def get_indexes(self) -> Dict[str, Any]:
         """Get all indexes"""
         indexes = self.client.get_indexes()
         # Convert Index objects to serializable dictionaries
         serialized_indexes = []
-        for index in indexes['results']:
-            serialized_indexes.append({
-                "uid": index.uid,
-                "primaryKey": index.primary_key,
-                "createdAt": index.created_at,
-                "updatedAt": index.updated_at
-            })
-        
+        for index in indexes["results"]:
+            serialized_indexes.append(
+                {
+                    "uid": index.uid,
+                    "primaryKey": index.primary_key,
+                    "createdAt": index.created_at,
+                    "updatedAt": index.updated_at,
+                }
+            )
+
         return {
             "results": serialized_indexes,
-            "offset": indexes['offset'],
-            "limit": indexes['limit'],
-            "total": indexes['total']
+            "offset": indexes["offset"],
+            "limit": indexes["limit"],
+            "total": indexes["total"],
         }
