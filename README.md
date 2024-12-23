@@ -2,6 +2,8 @@
 
 A Model Context Protocol (MCP) server for interacting with Meilisearch through LLM interfaces like Claude.
 
+<a href="https://glama.ai/mcp/servers/tbc3n51jja"><img width="380" height="200" src="https://glama.ai/mcp/servers/tbc3n51jja/badge" alt="Meilisearch Server MCP server" /></a>
+
 ## Features
 
 - Index and document management 
