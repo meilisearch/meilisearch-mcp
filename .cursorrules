@@ -1,0 +1,36 @@
+You are working on the Meilisearch MCP Server project, a Model Context Protocol (MCP) server that enables interaction with Meilisearch through LLM interfaces like Claude.
+
+Key Technologies:
+- Python 3.10+
+- Meilisearch API (v0.33.0+)
+- Model Context Protocol (MCP v0.1.0+)
+- HTTPX for HTTP requests
+- Pydantic for data validation
+
+Project Goals:
+1. Provide a seamless interface between LLMs and Meilisearch
+2. Enable comprehensive search functionality across indices
+3. Support full Meilisearch feature set including:
+   - Index and document management
+   - Settings configuration
+   - Task monitoring
+   - API key management
+   - Health monitoring
+
+Development Guidelines:
+1. Follow Python best practices and PEP standards
+2. Use type hints and Pydantic models for data validation
+3. Maintain comprehensive error handling
+4. Keep code modular and maintainable
+5. Write clear documentation for all features
+6. Test thoroughly using pytest
+7. Format code using black with line length 88
+
+Remember to:
+- Create feature branches for new development
+- Update documentation when adding features
+- Follow semantic versioning
+- Consider backward compatibility
+- Handle API errors gracefully
+- Log important operations
+- Validate all user inputs 
