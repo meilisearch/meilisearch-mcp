@@ -1,0 +1,20 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    properties:
+      meiliHttpAddr:
+        type: string
+        default: http://localhost:7700
+        description: The HTTP address of the Meilisearch instance.
+      meiliMasterKey:
+        type: string
+        default: null
+        description: The master key for the Meilisearch instance.
+  commandFunction:
+    # A function that produces the CLI command to start the MCP on stdio.
+    |-
+    (config) => ({ command: '.venv/bin/python', args: ['-m', 'src.meilisearch_mcp'], env: { MEILI_HTTP_ADDR: config.meiliHttpAddr, MEILI_MASTER_KEY: config.meiliMasterKey || '' } })
