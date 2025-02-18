@@ -1,5 +1,6 @@
 # Meilisearch MCP Server
 
+[![smithery badge](https://smithery.ai/badge/meilisearch-mcp-server)](https://smithery.ai/server/meilisearch-mcp-server)
 A Model Context Protocol (MCP) server for interacting with Meilisearch through LLM interfaces like Claude.
 
 <a href="https://glama.ai/mcp/servers/tbc3n51jja"><img width="380" height="200" src="https://glama.ai/mcp/servers/tbc3n51jja/badge" alt="Meilisearch Server MCP server" /></a>
@@ -15,6 +16,15 @@ A Model Context Protocol (MCP) server for interacting with Meilisearch through L
 
 ## Installation
 
+### Installing via Smithery
+
+To install Meilisearch MCP for Claude Desktop automatically via [Smithery](https://smithery.ai/server/meilisearch-mcp-server):
+
+```bash
+npx -y @smithery/cli install meilisearch-mcp-server --client claude
+```
+
+### Manual Installation
 ```bash
 # Clone repository
 git clone <repository_url>
