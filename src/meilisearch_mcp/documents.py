@@ -1,5 +1,14 @@
 from typing import Dict, Any, List, Optional, Union
 from meilisearch import Client
+import json
+from datetime import datetime
+
+
+def json_serializer(obj: Any) -> str:
+    """Custom JSON serializer for objects not serializable by default json code"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    return str(obj)
 
 
 class DocumentManager:
@@ -18,9 +27,11 @@ class DocumentManager:
         """Get documents from an index"""
         try:
             index = self.client.index(index_uid)
-            return index.get_documents(
+            documents = index.get_documents(
                 {"offset": offset, "limit": limit, "fields": fields}
             )
+            # Convert to JSON-serializable format
+            return json.loads(json.dumps(documents, default=json_serializer))
         except Exception as e:
             raise Exception(f"Failed to get documents: {str(e)}")
 
@@ -30,7 +41,9 @@ class DocumentManager:
         """Get a single document"""
         try:
             index = self.client.index(index_uid)
-            return index.get_document(document_id)
+            document = index.get_document(document_id)
+            # Convert to JSON-serializable format
+            return json.loads(json.dumps(document, default=json_serializer))
         except Exception as e:
             raise Exception(f"Failed to get document: {str(e)}")
 
@@ -43,7 +56,9 @@ class DocumentManager:
         """Add documents to an index"""
         try:
             index = self.client.index(index_uid)
-            return index.add_documents(documents, primary_key)
+            result = index.add_documents(documents, primary_key)
+            # Convert to JSON-serializable format
+            return json.loads(json.dumps(result, default=json_serializer))
         except Exception as e:
             raise Exception(f"Failed to add documents: {str(e)}")
 
@@ -53,7 +68,9 @@ class DocumentManager:
         """Update documents in an index"""
         try:
             index = self.client.index(index_uid)
-            return index.update_documents(documents)
+            result = index.update_documents(documents)
+            # Convert to JSON-serializable format
+            return json.loads(json.dumps(result, default=json_serializer))
         except Exception as e:
             raise Exception(f"Failed to update documents: {str(e)}")
 
@@ -63,7 +80,9 @@ class DocumentManager:
         """Delete a single document"""
         try:
             index = self.client.index(index_uid)
-            return index.delete_document(document_id)
+            result = index.delete_document(document_id)
+            # Convert to JSON-serializable format
+            return json.loads(json.dumps(result, default=json_serializer))
         except Exception as e:
             raise Exception(f"Failed to delete document: {str(e)}")
 
@@ -73,7 +92,9 @@ class DocumentManager:
         """Delete multiple documents by ID"""
         try:
             index = self.client.index(index_uid)
-            return index.delete_documents(document_ids)
+            result = index.delete_documents(document_ids)
+            # Convert to JSON-serializable format
+            return json.loads(json.dumps(result, default=json_serializer))
         except Exception as e:
             raise Exception(f"Failed to delete documents: {str(e)}")
 
@@ -81,6 +102,8 @@ class DocumentManager:
         """Delete all documents in an index"""
         try:
             index = self.client.index(index_uid)
-            return index.delete_all_documents()
+            result = index.delete_all_documents()
+            # Convert to JSON-serializable format
+            return json.loads(json.dumps(result, default=json_serializer))
         except Exception as e:
             raise Exception(f"Failed to delete all documents: {str(e)}")
