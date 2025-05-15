@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/meilisearch-meilisearch-mcp-badge.png)](https://mseep.ai/app/meilisearch-meilisearch-mcp)
+
 # Meilisearch MCP Server
 
 A Model Context Protocol (MCP) server for interacting with Meilisearch through LLM interfaces like Claude.
