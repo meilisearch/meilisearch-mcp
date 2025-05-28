@@ -137,6 +137,7 @@ npx @modelcontextprotocol/inspector python -m src.meilisearch_mcp
 ### Index Management
 - `create-index`: Create a new index with optional primary key
 - `list-indexes`: List all available indexes
+- `delete-index`: Delete an existing index
 - `get-index-metrics`: Get detailed metrics for a specific index
 
 ### Document Operations

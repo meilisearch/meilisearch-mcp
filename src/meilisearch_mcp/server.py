@@ -111,6 +111,15 @@ class MeilisearchMCPServer:
                     inputSchema={"type": "object", "properties": {}},
                 ),
                 types.Tool(
+                    name="delete-index",
+                    description="Delete a Meilisearch index",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {"uid": {"type": "string"}},
+                        "required": ["uid"],
+                    },
+                ),
+                types.Tool(
                     name="get-documents",
                     description="Get documents from an index",
                     inputSchema={
@@ -314,6 +323,15 @@ class MeilisearchMCPServer:
                     return [
                         types.TextContent(
                             type="text", text=f"Indexes:\n{formatted_json}"
+                        )
+                    ]
+
+                elif name == "delete-index":
+                    await self.meili_client.indexes.delete_index(arguments["uid"])
+                    return [
+                        types.TextContent(
+                            type="text",
+                            text=f"Successfully deleted index: {arguments['uid']}",
                         )
                     ]
 
