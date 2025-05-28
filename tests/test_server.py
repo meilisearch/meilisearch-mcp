@@ -1,4 +1,9 @@
+import importlib
 import pytest
+
+if importlib.util.find_spec("mcp") is None:  # pragma: no cover - dependency missing
+    pytest.skip("mcp dependency not installed", allow_module_level=True)
+
 from src.meilisearch_mcp.server import create_server
 
 
