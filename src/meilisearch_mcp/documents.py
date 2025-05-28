@@ -11,16 +11,21 @@ class DocumentManager:
     async def get_documents(
         self,
         index_uid: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
+        offset: Optional[int] = 0,
+        limit: Optional[int] = 20,
         fields: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Get documents from an index"""
         try:
             index = self.client.index(index_uid)
-            return index.get_documents(
-                {"offset": offset, "limit": limit, "fields": fields}
-            )
+            params = {
+                "offset": offset if offset is not None else 0,
+                "limit": limit if limit is not None else 20,
+            }
+            if fields is not None:
+                params["fields"] = fields
+
+            return index.get_documents(params)
         except Exception as e:
             raise Exception(f"Failed to get documents: {str(e)}")
 
