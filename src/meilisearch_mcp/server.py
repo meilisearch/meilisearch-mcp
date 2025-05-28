@@ -10,6 +10,7 @@ import mcp.server.stdio
 
 from .client import MeilisearchClient
 from .logging import MCPLogger
+from .tasks import serialize_task_results
 
 logger = MCPLogger()
 
@@ -323,8 +324,13 @@ class MeilisearchMCPServer:
                         arguments.get("offset"),
                         arguments.get("limit"),
                     )
+                    serialized_docs = serialize_task_results(documents)
+                    formatted_json = json.dumps(serialized_docs, indent=2, default=json_serializer)
                     return [
-                        types.TextContent(type="text", text=f"Documents: {documents}")
+                        types.TextContent(
+                            type="text",
+                            text=f"Documents:\n{formatted_json}"
+                        )
                     ]
 
                 elif name == "add-documents":

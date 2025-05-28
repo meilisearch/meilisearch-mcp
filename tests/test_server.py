@@ -1,4 +1,8 @@
 import pytest
+
+# Skip tests if the `mcp` package is not installed
+pytest.importorskip("mcp")
+
 from src.meilisearch_mcp.server import create_server
 
 
