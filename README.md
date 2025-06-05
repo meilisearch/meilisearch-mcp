@@ -190,3 +190,32 @@ npx @modelcontextprotocol/inspector python -m src.meilisearch_mcp
 ## License
 
 MIT
+
+## Continuous Integration & End-to-End Testing
+
+This repository includes a GitHub Actions workflow for end-to-end (E2E) testing of the Meilisearch MCP server. The CI automatically starts a Meilisearch instance and runs a suite of tests to ensure the MCP server works as expected.
+
+### How CI Works
+- Uses [moy2010/meilisearch-github-action](https://github.com/marketplace/actions/meilisearch-in-github-actions) to start Meilisearch on port 7700.
+- Installs all dependencies and runs the test suite with pytest (including async tests).
+- Tests cover MCP server features such as index creation, document addition, and search.
+
+### Running E2E Tests Locally
+
+To run the end-to-end tests locally:
+
+1. Start a Meilisearch instance (e.g. with Docker):
+   ```bash
+   docker run -d --name meilisearch -p 7700:7700 getmeili/meilisearch:latest
+   ```
+2. (Optional) Set the MEILI_HTTP_ADDR and MEILI_MASTER_KEY environment variables if needed.
+3. Install dev dependencies:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+4. Run the tests:
+   ```bash
+   pytest tests/ -v
+   ```
+
+The tests will launch the MCP server and interact with it to verify its behavior.
