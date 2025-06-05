@@ -15,10 +15,18 @@ def meilisearch_url():
     return "http://localhost:7700"
 
 
+@pytest.fixture
+def meilisearch_api_key():
+    """Meilisearch API key for testing"""
+    import os
+
+    return os.getenv("MEILI_MASTER_KEY")
+
+
 @pytest_asyncio.fixture
-async def mcp_server(meilisearch_url):
+async def mcp_server(meilisearch_url, meilisearch_api_key):
     """Create MCP server instance for testing"""
-    server = create_server(url=meilisearch_url, api_key=None)
+    server = create_server(url=meilisearch_url, api_key=meilisearch_api_key)
     yield server
     await server.cleanup()
 

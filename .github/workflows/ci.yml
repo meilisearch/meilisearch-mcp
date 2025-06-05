@@ -131,7 +131,7 @@ jobs:
     - name: Run integration tests
       run: |
         source .venv/bin/activate
-        python -m pytest tests/test_mcp_e2e.py -v --tb=long -k "not test_invalid"
+        python -m pytest tests/test_mcp_integration.py -v --tb=long -k "not test_invalid"
       env:
         MEILI_HTTP_ADDR: http://localhost:7700
         MEILI_MASTER_KEY: integration_test_key
