@@ -391,6 +391,9 @@ class TestMCPDocumentOperations:
         # First create an index
         await simulate_tool_call(mcp_server, "create-index", {"uid": clean_index})
 
+        # Wait for index to be fully created
+        await asyncio.sleep(0.5)
+
         # Add documents
         documents = [
             {"id": 1, "title": "Test Movie", "genre": "Action"},
@@ -413,6 +416,9 @@ class TestMCPDocumentOperations:
         """Test get-documents tool"""
         # First create an index and add documents
         await simulate_tool_call(mcp_server, "create-index", {"uid": clean_index})
+
+        # Wait for index to be fully created
+        await asyncio.sleep(0.5)
 
         documents = [{"id": 1, "title": "Test Movie"}]
         await simulate_tool_call(
@@ -443,6 +449,9 @@ class TestMCPSearch:
         """Test search tool with specific index"""
         # Setup: create index and add documents
         await simulate_tool_call(mcp_server, "create-index", {"uid": clean_index})
+
+        # Wait for index to be fully created
+        await asyncio.sleep(0.5)
 
         documents = [
             {"id": 1, "title": "Action Movie", "genre": "Action"},
@@ -492,6 +501,13 @@ class TestMCPSettings:
         # Create index first
         await simulate_tool_call(mcp_server, "create-index", {"uid": clean_index})
 
+        # Wait for index to be fully created
+        await asyncio.sleep(1)
+
+        # Verify index exists by listing indexes
+        indexes_result = await simulate_tool_call(mcp_server, "list-indexes")
+        assert clean_index in indexes_result[0].text
+
         result = await simulate_tool_call(
             mcp_server, "get-settings", {"indexUid": clean_index}
         )
@@ -506,6 +522,9 @@ class TestMCPSettings:
         """Test update-settings tool"""
         # Create index first
         await simulate_tool_call(mcp_server, "create-index", {"uid": clean_index})
+
+        # Wait for index to be fully created
+        await asyncio.sleep(1)
 
         # Update settings
         settings = {
