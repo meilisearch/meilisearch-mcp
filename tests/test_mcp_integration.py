@@ -1,5 +1,4 @@
 import pytest
-import pytest_asyncio
 import asyncio
 import json
 import time
@@ -23,7 +22,7 @@ def meilisearch_api_key():
     return os.getenv("MEILI_MASTER_KEY")
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def mcp_server(meilisearch_url, meilisearch_api_key):
     """Create MCP server instance for testing"""
     server = create_server(url=meilisearch_url, api_key=meilisearch_api_key)
@@ -31,7 +30,7 @@ async def mcp_server(meilisearch_url, meilisearch_api_key):
     await server.cleanup()
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def clean_index():
     """Provide a clean test index name and cleanup after test"""
     index_name = f"test_index_{int(time.time())}"

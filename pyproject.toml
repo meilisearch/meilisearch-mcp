@@ -27,6 +27,7 @@ pythonpath = [
 testpaths = [
     "tests"
 ]
+asyncio_mode = "auto"
 
 [tool.black]
 line-length = 88
