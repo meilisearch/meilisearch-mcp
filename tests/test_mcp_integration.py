@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio  # Explicit import to ensure plugin is loaded
 import asyncio
 import json
 import time

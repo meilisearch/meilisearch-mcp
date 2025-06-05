@@ -51,6 +51,7 @@ jobs:
       run: |
         uv pip install -e .
         uv pip install -r requirements-dev.txt
+        uv pip install pytest-asyncio>=0.21.0
 
     - name: Wait for Meilisearch to be ready
       run: |
@@ -116,6 +117,7 @@ jobs:
         uv venv
         uv pip install -e .
         uv pip install -r requirements-dev.txt
+        uv pip install pytest-asyncio>=0.21.0
 
     - name: Wait for Meilisearch
       run: |
