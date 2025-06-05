@@ -1,0 +1,145 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      meilisearch:
+        image: getmeili/meilisearch:v1.6
+        env:
+          MEILI_MASTER_KEY: test_master_key
+          MEILI_NO_ANALYTICS: true
+          MEILI_ENV: development
+          MEILI_LOG_LEVEL: INFO
+          MEILI_DB_PATH: /meili_data
+        ports:
+          - 7700:7700
+        options: >-
+          --health-cmd "curl -f http://localhost:7700/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Create virtual environment
+      run: uv venv
+
+    - name: Install dependencies
+      run: |
+        uv pip install -e .
+        uv pip install -r requirements-dev.txt
+
+    - name: Wait for Meilisearch to be ready
+      run: |
+        for i in {1..30}; do
+          if curl -f http://localhost:7700/health; then
+            echo "Meilisearch is ready!"
+            break
+          fi
+          echo "Waiting for Meilisearch... attempt $i"
+          sleep 2
+        done
+
+    - name: Test Meilisearch connection
+      run: |
+        curl -X GET 'http://localhost:7700/health'
+        curl -X GET 'http://localhost:7700/version'
+
+    - name: Run tests with pytest
+      run: |
+        source .venv/bin/activate
+        python -m pytest tests/ -v --tb=short
+      env:
+        MEILI_HTTP_ADDR: http://localhost:7700
+        MEILI_MASTER_KEY: test_master_key
+
+    - name: Run code formatting check
+      run: |
+        source .venv/bin/activate
+        python -m black --check src/ tests/
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    services:
+      meilisearch:
+        image: getmeili/meilisearch:v1.6
+        env:
+          MEILI_MASTER_KEY: integration_test_key
+          MEILI_NO_ANALYTICS: true
+          MEILI_ENV: development
+        ports:
+          - 7700:7700
+        options: >-
+          --health-cmd "curl -f http://localhost:7700/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Install dependencies
+      run: |
+        uv venv
+        uv pip install -e .
+        uv pip install -r requirements-dev.txt
+
+    - name: Wait for Meilisearch
+      run: |
+        for i in {1..30}; do
+          if curl -f http://localhost:7700/health; then
+            echo "Meilisearch is ready!"
+            break
+          fi
+          echo "Waiting for Meilisearch... attempt $i"
+          sleep 2
+        done
+
+    - name: Run integration tests
+      run: |
+        source .venv/bin/activate
+        python -m pytest tests/test_mcp_e2e.py -v --tb=long -k "not test_invalid"
+      env:
+        MEILI_HTTP_ADDR: http://localhost:7700
+        MEILI_MASTER_KEY: integration_test_key
+
+    - name: Test MCP server startup
+      run: |
+        source .venv/bin/activate
+        timeout 10s python -m src.meilisearch_mcp || true
+      env:
+        MEILI_HTTP_ADDR: http://localhost:7700
+        MEILI_MASTER_KEY: integration_test_key

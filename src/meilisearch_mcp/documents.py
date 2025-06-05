@@ -18,9 +18,16 @@ class DocumentManager:
         """Get documents from an index"""
         try:
             index = self.client.index(index_uid)
-            return index.get_documents(
-                {"offset": offset, "limit": limit, "fields": fields}
-            )
+            # Build parameters dict, excluding None values
+            params = {}
+            if offset is not None:
+                params["offset"] = offset
+            if limit is not None:
+                params["limit"] = limit
+            if fields is not None:
+                params["fields"] = fields
+
+            return index.get_documents(params)
         except Exception as e:
             raise Exception(f"Failed to get documents: {str(e)}")
 

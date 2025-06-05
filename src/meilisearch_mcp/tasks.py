@@ -5,7 +5,7 @@ from datetime import datetime
 
 def serialize_task_results(obj: Any) -> Any:
     """Serialize task results into JSON-compatible format"""
-    if hasattr(obj, '__dict__'):
+    if hasattr(obj, "__dict__"):
         return {k: serialize_task_results(v) for k, v in obj.__dict__.items()}
     elif isinstance(obj, (list, tuple)):
         return [serialize_task_results(item) for item in obj]

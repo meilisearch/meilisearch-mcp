@@ -52,7 +52,7 @@ class MeilisearchClient:
         offset: Optional[int] = 0,
         filter: Optional[str] = None,
         sort: Optional[List[str]] = None,
-        **kwargs
+        **kwargs,
     ) -> Dict[str, Any]:
         """
         Search through Meilisearch indices.
@@ -65,12 +65,12 @@ class MeilisearchClient:
                 "limit": limit if limit is not None else 20,
                 "offset": offset if offset is not None else 0,
             }
-            
+
             if filter is not None:
                 search_params["filter"] = filter
             if sort is not None:
                 search_params["sort"] = sort
-                
+
             # Add any additional parameters
             search_params.update({k: v for k, v in kwargs.items() if v is not None})
 
@@ -82,7 +82,7 @@ class MeilisearchClient:
                 # Search across all indices
                 results = {}
                 indexes = self.client.get_indexes()
-                
+
                 for index in indexes["results"]:
                     try:
                         search_result = index.search(query, search_params)
@@ -91,13 +91,9 @@ class MeilisearchClient:
                     except Exception as e:
                         logger.warning(f"Failed to search index {index.uid}: {str(e)}")
                         continue
-                
-                return {
-                    "multi_index": True,
-                    "query": query,
-                    "results": results
-                }
-                
+
+                return {"multi_index": True, "query": query, "results": results}
+
         except Exception as e:
             raise Exception(f"Search failed: {str(e)}")
 
