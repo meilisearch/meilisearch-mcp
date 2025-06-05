@@ -74,7 +74,7 @@ jobs:
     - name: Run tests with pytest
       run: |
         source .venv/bin/activate
-        python -m pytest tests/test_server.py tests/test_mcp_simple.py -v --tb=short
+        python -m pytest tests/test_server.py tests/test_mcp_sync.py -v --tb=short
       env:
         MEILI_HTTP_ADDR: http://localhost:7700
         MEILI_MASTER_KEY: test_master_key
@@ -137,7 +137,7 @@ jobs:
     - name: Run integration tests
       run: |
         source .venv/bin/activate
-        python -m pytest tests/test_mcp_simple.py -v --tb=long
+        python -m pytest tests/test_mcp_sync.py -v --tb=long
       env:
         MEILI_HTTP_ADDR: http://localhost:7700
         MEILI_MASTER_KEY: integration_test_key
