@@ -27,7 +27,7 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         # Use the _execute_tool_directly method which we know works
         try:
             result = await server._execute_tool_directly("health-check")
@@ -44,7 +44,7 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         try:
             result = await server._execute_tool_directly("get-version")
             assert isinstance(result, list)
@@ -60,7 +60,7 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         try:
             result = await server._execute_tool_directly("get-stats")
             assert isinstance(result, list)
@@ -76,7 +76,7 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         try:
             result = await server._execute_tool_directly("list-indexes")
             assert isinstance(result, list)
@@ -92,11 +92,13 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         index_name = f"test_simple_{int(time.time())}"
-        
+
         try:
-            result = await server._execute_tool_directly("create-index", {"uid": index_name})
+            result = await server._execute_tool_directly(
+                "create-index", {"uid": index_name}
+            )
             assert isinstance(result, list)
             assert len(result) > 0
             assert isinstance(result[0], types.TextContent)
@@ -104,13 +106,13 @@ class TestMCPServerSimple:
         finally:
             await server.cleanup()
 
-    @pytest.mark.asyncio 
+    @pytest.mark.asyncio
     async def test_connection_settings_simple(self):
         """Test connection settings tools with simple setup"""
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         try:
             # Test get connection settings
             result = await server._execute_tool_directly("get-connection-settings")
@@ -128,9 +130,11 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         try:
-            result = await server._execute_tool_directly("search", {"query": "test", "limit": 5})
+            result = await server._execute_tool_directly(
+                "search", {"query": "test", "limit": 5}
+            )
             assert isinstance(result, list)
             assert len(result) > 0
             assert isinstance(result[0], types.TextContent)
@@ -144,7 +148,7 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         try:
             result = await server._execute_tool_directly("get-tasks", {"limit": 10})
             assert isinstance(result, list)
@@ -160,7 +164,7 @@ class TestMCPServerSimple:
         meilisearch_url = "http://localhost:7700"
         api_key = os.getenv("MEILI_MASTER_KEY")
         server = create_server(url=meilisearch_url, api_key=api_key)
-        
+
         try:
             result = await server._execute_tool_directly("non-existent-tool")
             assert isinstance(result, list)
@@ -172,11 +176,13 @@ class TestMCPServerSimple:
 
 
 # Add the helper method to the server class if it doesn't exist
-async def _execute_tool_directly(self, name: str, arguments: Optional[Dict[str, Any]] = None):
+async def _execute_tool_directly(
+    self, name: str, arguments: Optional[Dict[str, Any]] = None
+):
     """Direct tool execution for testing purposes"""
     try:
         args = arguments or {}
-        
+
         if name == "get-connection-settings":
             return [
                 types.TextContent(
@@ -184,7 +190,7 @@ async def _execute_tool_directly(self, name: str, arguments: Optional[Dict[str, 
                     text=f"Current connection settings:\nURL: {self.url}\nAPI Key: {'*' * 8 if self.api_key else 'Not set'}",
                 )
             ]
-        
+
         elif name == "health-check":
             is_healthy = await self.meili_client.health_check()
             return [
@@ -193,26 +199,26 @@ async def _execute_tool_directly(self, name: str, arguments: Optional[Dict[str, 
                     text=f"Meilisearch is {is_healthy and 'available' or 'unavailable'}",
                 )
             ]
-        
+
         elif name == "get-version":
             version = await self.meili_client.get_version()
             return [types.TextContent(type="text", text=f"Version info: {version}")]
-        
+
         elif name == "get-stats":
             stats = await self.meili_client.get_stats()
             return [types.TextContent(type="text", text=f"Database stats: {stats}")]
-        
+
         elif name == "create-index":
             result = await self.meili_client.indexes.create_index(
                 args["uid"], args.get("primaryKey")
             )
             return [types.TextContent(type="text", text=f"Created index: {result}")]
-        
+
         elif name == "list-indexes":
             indexes = await self.meili_client.get_indexes()
             formatted_json = json.dumps(indexes, indent=2, default=str)
             return [types.TextContent(type="text", text=f"Indexes:\n{formatted_json}")]
-        
+
         elif name == "search":
             search_results = await self.meili_client.search(
                 query=args["query"],
@@ -229,24 +235,36 @@ async def _execute_tool_directly(self, name: str, arguments: Optional[Dict[str, 
                     text=f"Search results for '{args['query']}':\n{formatted_results}",
                 )
             ]
-        
+
         elif name == "get-tasks":
             valid_params = {
-                "limit", "from", "reverse", "batchUids", "uids", "canceledBy",
-                "types", "statuses", "indexUids", "afterEnqueuedAt", "beforeEnqueuedAt",
-                "afterStartedAt", "beforeStartedAt", "afterFinishedAt", "beforeFinishedAt"
+                "limit",
+                "from",
+                "reverse",
+                "batchUids",
+                "uids",
+                "canceledBy",
+                "types",
+                "statuses",
+                "indexUids",
+                "afterEnqueuedAt",
+                "beforeEnqueuedAt",
+                "afterStartedAt",
+                "beforeStartedAt",
+                "afterFinishedAt",
+                "beforeFinishedAt",
             }
             filtered_args = {k: v for k, v in args.items() if k in valid_params}
             tasks = await self.meili_client.tasks.get_tasks(filtered_args)
             return [types.TextContent(type="text", text=f"Tasks: {tasks}")]
-        
+
         else:
             raise ValueError(f"Unknown tool: {name}")
-    
+
     except Exception as e:
         return [types.TextContent(type="text", text=f"Error: {str(e)}")]
 
 
 # Monkey patch the method onto the server class if it doesn't exist
-if not hasattr(MeilisearchMCPServer, '_execute_tool_directly'):
+if not hasattr(MeilisearchMCPServer, "_execute_tool_directly"):
     MeilisearchMCPServer._execute_tool_directly = _execute_tool_directly
