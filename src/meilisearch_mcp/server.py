@@ -72,7 +72,11 @@ class MeilisearchMCPServer:
                 types.Tool(
                     name="get-connection-settings",
                     description="Get current Meilisearch connection settings",
-                    inputSchema={"type": "object", "properties": {}},
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
                 ),
                 types.Tool(
                     name="update-connection-settings",
@@ -80,25 +84,38 @@ class MeilisearchMCPServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "url": {"type": "string", "optional": True},
-                            "api_key": {"type": "string", "optional": True},
+                            "url": {"type": "string"},
+                            "api_key": {"type": "string"},
                         },
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
                     name="health-check",
                     description="Check Meilisearch server health",
-                    inputSchema={"type": "object", "properties": {}},
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
                 ),
                 types.Tool(
                     name="get-version",
                     description="Get Meilisearch version information",
-                    inputSchema={"type": "object", "properties": {}},
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
                 ),
                 types.Tool(
                     name="get-stats",
                     description="Get database statistics",
-                    inputSchema={"type": "object", "properties": {}},
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
                 ),
                 types.Tool(
                     name="create-index",
@@ -107,15 +124,20 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {
                             "uid": {"type": "string"},
-                            "primaryKey": {"type": "string", "optional": True},
+                            "primaryKey": {"type": "string"},
                         },
                         "required": ["uid"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
                     name="list-indexes",
                     description="List all Meilisearch indexes",
-                    inputSchema={"type": "object", "properties": {}},
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
                 ),
                 types.Tool(
                     name="delete-index",
@@ -124,6 +146,7 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {"uid": {"type": "string"}},
                         "required": ["uid"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -133,10 +156,11 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {
                             "indexUid": {"type": "string"},
-                            "offset": {"type": "integer", "optional": True},
-                            "limit": {"type": "integer", "optional": True},
+                            "offset": {"type": "integer"},
+                            "limit": {"type": "integer"},
                         },
                         "required": ["indexUid"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -146,10 +170,17 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {
                             "indexUid": {"type": "string"},
-                            "documents": {"type": "array", "items": {"type": "object"}},
-                            "primaryKey": {"type": "string", "optional": True},
+                            "documents": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": True,
+                                },
+                            },
+                            "primaryKey": {"type": "string"},
                         },
                         "required": ["indexUid", "documents"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -159,6 +190,7 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {"indexUid": {"type": "string"}},
                         "required": ["indexUid"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -168,9 +200,13 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {
                             "indexUid": {"type": "string"},
-                            "settings": {"type": "object"},
+                            "settings": {
+                                "type": "object",
+                                "additionalProperties": True,
+                            },
                         },
                         "required": ["indexUid", "settings"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -180,17 +216,17 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {
                             "query": {"type": "string"},
-                            "indexUid": {"type": "string", "optional": True},
-                            "limit": {"type": "integer", "optional": True},
-                            "offset": {"type": "integer", "optional": True},
-                            "filter": {"type": "string", "optional": True},
+                            "indexUid": {"type": "string"},
+                            "limit": {"type": "integer"},
+                            "offset": {"type": "integer"},
+                            "filter": {"type": "string"},
                             "sort": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "optional": True,
                             },
                         },
                         "required": ["query"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -200,6 +236,7 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {"taskUid": {"type": "integer"}},
                         "required": ["taskUid"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -208,46 +245,41 @@ class MeilisearchMCPServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "limit": {"type": "integer", "optional": True},
-                            "from": {"type": "integer", "optional": True},
-                            "reverse": {"type": "boolean", "optional": True},
+                            "limit": {"type": "integer"},
+                            "from": {"type": "integer"},
+                            "reverse": {"type": "boolean"},
                             "batchUids": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "optional": True,
                             },
                             "uids": {
                                 "type": "array",
                                 "items": {"type": "integer"},
-                                "optional": True,
                             },
                             "canceledBy": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "optional": True,
                             },
                             "types": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "optional": True,
                             },
                             "statuses": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "optional": True,
                             },
                             "indexUids": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "optional": True,
                             },
-                            "afterEnqueuedAt": {"type": "string", "optional": True},
-                            "beforeEnqueuedAt": {"type": "string", "optional": True},
-                            "afterStartedAt": {"type": "string", "optional": True},
-                            "beforeStartedAt": {"type": "string", "optional": True},
-                            "afterFinishedAt": {"type": "string", "optional": True},
-                            "beforeFinishedAt": {"type": "string", "optional": True},
+                            "afterEnqueuedAt": {"type": "string"},
+                            "beforeEnqueuedAt": {"type": "string"},
+                            "afterStartedAt": {"type": "string"},
+                            "beforeStartedAt": {"type": "string"},
+                            "afterFinishedAt": {"type": "string"},
+                            "beforeFinishedAt": {"type": "string"},
                         },
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -256,11 +288,12 @@ class MeilisearchMCPServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "uids": {"type": "string", "optional": True},
-                            "indexUids": {"type": "string", "optional": True},
-                            "types": {"type": "string", "optional": True},
-                            "statuses": {"type": "string", "optional": True},
+                            "uids": {"type": "string"},
+                            "indexUids": {"type": "string"},
+                            "types": {"type": "string"},
+                            "statuses": {"type": "string"},
                         },
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -269,9 +302,10 @@ class MeilisearchMCPServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "offset": {"type": "integer", "optional": True},
-                            "limit": {"type": "integer", "optional": True},
+                            "offset": {"type": "integer"},
+                            "limit": {"type": "integer"},
                         },
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -280,12 +314,13 @@ class MeilisearchMCPServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "description": {"type": "string", "optional": True},
+                            "description": {"type": "string"},
                             "actions": {"type": "array", "items": {"type": "string"}},
                             "indexes": {"type": "array", "items": {"type": "string"}},
-                            "expiresAt": {"type": "string", "optional": True},
+                            "expiresAt": {"type": "string"},
                         },
                         "required": ["actions", "indexes"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
@@ -295,12 +330,17 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {"key": {"type": "string"}},
                         "required": ["key"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
                     name="get-health-status",
                     description="Get comprehensive health status of Meilisearch",
-                    inputSchema={"type": "object", "properties": {}},
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
                 ),
                 types.Tool(
                     name="get-index-metrics",
@@ -309,12 +349,17 @@ class MeilisearchMCPServer:
                         "type": "object",
                         "properties": {"indexUid": {"type": "string"}},
                         "required": ["indexUid"],
+                        "additionalProperties": False,
                     },
                 ),
                 types.Tool(
                     name="get-system-info",
                     description="Get system-level information",
-                    inputSchema={"type": "object", "properties": {}},
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
                 ),
             ]
 

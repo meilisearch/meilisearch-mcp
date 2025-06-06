@@ -610,3 +610,105 @@ class TestIssue23DeleteIndexTool:
         )
         search_after_text = assert_text_content_response(search_after_delete, "Error:")
         assert "Error:" in search_after_text
+
+
+class TestIssue27OpenAISchemaCompatibility:
+    """Test for issue #27 - Fix JSON schemas for OpenAI Agent SDK compatibility"""
+
+    async def test_all_schemas_have_additional_properties_false(self, mcp_server):
+        """Test that all tool schemas include additionalProperties: false for OpenAI compatibility (issue #27)"""
+        tools = await simulate_list_tools(mcp_server)
+
+        for tool in tools:
+            schema = tool.inputSchema
+            assert schema["type"] == "object"
+            assert (
+                "additionalProperties" in schema
+            ), f"Tool '{tool.name}' missing additionalProperties"
+            assert (
+                schema["additionalProperties"] is False
+            ), f"Tool '{tool.name}' additionalProperties should be false"
+
+    async def test_array_schemas_have_items_property(self, mcp_server):
+        """Test that all array schemas include items property for OpenAI compatibility (issue #27)"""
+        tools = await simulate_list_tools(mcp_server)
+
+        tools_with_arrays = ["add-documents", "search", "get-tasks", "create-key"]
+
+        for tool in tools:
+            if tool.name in tools_with_arrays:
+                schema = tool.inputSchema
+                properties = schema.get("properties", {})
+
+                for prop_name, prop_schema in properties.items():
+                    if prop_schema.get("type") == "array":
+                        assert (
+                            "items" in prop_schema
+                        ), f"Tool '{tool.name}' property '{prop_name}' missing items"
+                        assert isinstance(
+                            prop_schema["items"], dict
+                        ), f"Tool '{tool.name}' property '{prop_name}' items should be object"
+
+    async def test_no_custom_optional_properties(self, mcp_server):
+        """Test that schemas don't use non-standard 'optional' property (issue #27)"""
+        tools = await simulate_list_tools(mcp_server)
+
+        for tool in tools:
+            schema = tool.inputSchema
+            properties = schema.get("properties", {})
+
+            for prop_name, prop_schema in properties.items():
+                assert (
+                    "optional" not in prop_schema
+                ), f"Tool '{tool.name}' property '{prop_name}' uses non-standard 'optional'"
+
+    async def test_specific_add_documents_schema_compliance(self, mcp_server):
+        """Test add-documents schema specifically mentioned in issue #27"""
+        tools = await simulate_list_tools(mcp_server)
+        add_docs_tool = next(tool for tool in tools if tool.name == "add-documents")
+
+        schema = add_docs_tool.inputSchema
+
+        # Verify overall structure
+        assert schema["type"] == "object"
+        assert schema["additionalProperties"] is False
+        assert "properties" in schema
+        assert "required" in schema
+
+        # Verify documents array property
+        documents_prop = schema["properties"]["documents"]
+        assert documents_prop["type"] == "array"
+        assert (
+            "items" in documents_prop
+        ), "add-documents documents array missing items property"
+        assert documents_prop["items"]["type"] == "object"
+
+        # Verify required fields
+        assert "indexUid" in schema["required"]
+        assert "documents" in schema["required"]
+        assert "primaryKey" not in schema["required"]  # Should be optional
+
+    async def test_openai_compatible_tool_schema_format(self, mcp_server):
+        """Test that tool schemas follow OpenAI function calling format (issue #27)"""
+        tools = await simulate_list_tools(mcp_server)
+
+        for tool in tools:
+            # Verify tool has required OpenAI attributes
+            assert hasattr(tool, "name")
+            assert hasattr(tool, "description")
+            assert hasattr(tool, "inputSchema")
+
+            # Verify schema structure matches OpenAI expectations
+            schema = tool.inputSchema
+            assert isinstance(schema, dict)
+            assert schema.get("type") == "object"
+            assert "properties" in schema
+            assert isinstance(schema["properties"], dict)
+
+            # If tool has required parameters, they should be in required array
+            if "required" in schema:
+                assert isinstance(schema["required"], list)
+
+                # All required fields should exist in properties
+                for required_field in schema["required"]:
+                    assert required_field in schema["properties"]
