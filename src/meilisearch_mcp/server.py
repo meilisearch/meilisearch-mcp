@@ -18,6 +18,9 @@ def json_serializer(obj: Any) -> str:
     """Custom JSON serializer for objects not serializable by default json code"""
     if isinstance(obj, datetime):
         return obj.isoformat()
+    # Handle Meilisearch model objects by using their __dict__ if available
+    if hasattr(obj, '__dict__'):
+        return obj.__dict__
     return str(obj)
 
 
@@ -318,13 +321,19 @@ class MeilisearchMCPServer:
                     ]
 
                 elif name == "get-documents":
+                    # Use default values to fix issue #17 (None offset/limit causes API errors)
+                    offset = arguments.get("offset", 0)
+                    limit = arguments.get("limit", 20)
                     documents = await self.meili_client.documents.get_documents(
                         arguments["indexUid"],
-                        arguments.get("offset"),
-                        arguments.get("limit"),
+                        offset,
+                        limit,
                     )
+                    # Convert DocumentsResults object to proper JSON format
+                    # The documents object should be directly JSON serializable from Meilisearch client
+                    formatted_json = json.dumps(documents, indent=2, default=json_serializer)
                     return [
-                        types.TextContent(type="text", text=f"Documents: {documents}")
+                        types.TextContent(type="text", text=f"Documents:\n{formatted_json}")
                     ]
 
                 elif name == "add-documents":
