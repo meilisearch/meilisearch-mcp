@@ -648,6 +648,7 @@ class TestHybridSearch:
         assert "retrieveVectors" in properties
         assert properties["retrieveVectors"]["type"] == "boolean"
 
+    @pytest.mark.skip(reason="Requires Meilisearch instance with embedders configured")
     async def test_search_with_hybrid_parameters(self, mcp_server):
         """Test that search accepts and processes hybrid search parameters"""
         # Create test index
@@ -694,6 +695,7 @@ class TestHybridSearch:
         # Cleanup
         await simulate_mcp_call(mcp_server, "delete-index", {"uid": index_name})
 
+    @pytest.mark.skip(reason="Requires Meilisearch instance with embedders configured")
     async def test_search_with_vector_parameter(self, mcp_server):
         """Test that search accepts vector parameter"""
         # Create test index
@@ -727,6 +729,7 @@ class TestHybridSearch:
         # Cleanup
         await simulate_mcp_call(mcp_server, "delete-index", {"uid": index_name})
 
+    @pytest.mark.skip(reason="Requires Meilisearch instance with embedders configured")
     async def test_search_semantic_only(self, mcp_server):
         """Test semantic-only search with semanticRatio=1.0"""
         # Create test index
