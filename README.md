@@ -133,19 +133,44 @@ Example usage through MCP:
 
 ### Search Functionality
 
-The server provides a flexible search tool that can search across one or all indices:
+The server provides a flexible search tool that can search across one or all indices with support for hybrid search (combining keyword and semantic search):
 
 - `search`: Search through Meilisearch indices with optional parameters
 
 Example usage through MCP:
 ```json
-// Search in a specific index
+// Traditional keyword search in a specific index
 {
   "name": "search",
   "arguments": {
     "query": "search term",
     "indexUid": "movies",
     "limit": 10
+  }
+}
+
+// Hybrid search combining keyword and semantic search
+{
+  "name": "search",
+  "arguments": {
+    "query": "artificial intelligence",
+    "indexUid": "documents",
+    "hybrid": {
+      "semanticRatio": 0.7,
+      "embedder": "default"
+    },
+    "limit": 20
+  }
+}
+
+// Semantic search with custom vector
+{
+  "name": "search",
+  "arguments": {
+    "query": "machine learning",
+    "indexUid": "articles",
+    "vector": [0.1, 0.2, 0.3, 0.4, 0.5],
+    "retrieveVectors": true
   }
 }
 
@@ -167,6 +192,13 @@ Available search parameters:
 - `offset`: Number of results to skip (optional, default: 0)
 - `filter`: Filter expression (optional)
 - `sort`: Sorting rules (optional)
+- `hybrid`: Hybrid search configuration (optional)
+  - `semanticRatio`: Balance between keyword (0.0) and semantic (1.0) search (optional, default: 0.5)
+  - `embedder`: Name of the configured embedder to use (required when using hybrid)
+- `vector`: Custom vector for semantic search (optional)
+- `retrieveVectors`: Include vector data in search results (optional)
+
+**Note**: To use hybrid search features, you need to have an embedder configured in your Meilisearch index settings. Refer to the [Meilisearch documentation on vector search](https://www.meilisearch.com/docs/learn/vector_search/vector_search_basics) for configuration details.
 
 ### Running the Server
 
@@ -210,7 +242,7 @@ npx @modelcontextprotocol/inspector python -m src.meilisearch_mcp
 - `add-documents`: Add or update documents in an index
 
 ### Search
-- `search`: Flexible search across single or multiple indices with filtering and sorting options
+- `search`: Flexible search across single or multiple indices with support for hybrid search (keyword + semantic), custom vectors, and filtering/sorting options
 
 ### Settings Management
 - `get-settings`: View current settings for an index

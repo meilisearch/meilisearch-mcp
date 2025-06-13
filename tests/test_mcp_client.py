@@ -612,6 +612,161 @@ class TestIssue23DeleteIndexTool:
         assert "Error:" in search_after_text
 
 
+class TestHybridSearch:
+    """Test hybrid search functionality with semantic search support"""
+
+    async def test_search_tool_has_hybrid_parameters(self, mcp_server):
+        """Test that search tool schema includes hybrid search parameters"""
+        tools = await simulate_list_tools(mcp_server)
+
+        # Find the search tool
+        search_tool = next((t for t in tools if t.name == "search"), None)
+        assert search_tool is not None, "Search tool not found"
+
+        # Check that hybrid parameters are in the schema
+        properties = search_tool.inputSchema["properties"]
+
+        # Check hybrid object parameter
+        assert "hybrid" in properties
+        hybrid_schema = properties["hybrid"]
+        assert hybrid_schema["type"] == "object"
+        assert "semanticRatio" in hybrid_schema["properties"]
+        assert "embedder" in hybrid_schema["properties"]
+        assert hybrid_schema["properties"]["semanticRatio"]["type"] == "number"
+        assert hybrid_schema["properties"]["semanticRatio"]["minimum"] == 0.0
+        assert hybrid_schema["properties"]["semanticRatio"]["maximum"] == 1.0
+        assert hybrid_schema["properties"]["embedder"]["type"] == "string"
+        assert hybrid_schema["required"] == ["embedder"]
+
+        # Check vector parameter
+        assert "vector" in properties
+        vector_schema = properties["vector"]
+        assert vector_schema["type"] == "array"
+        assert vector_schema["items"]["type"] == "number"
+
+        # Check retrieveVectors parameter
+        assert "retrieveVectors" in properties
+        assert properties["retrieveVectors"]["type"] == "boolean"
+
+    @pytest.mark.skip(reason="Requires Meilisearch instance with embedders configured")
+    async def test_search_with_hybrid_parameters(self, mcp_server):
+        """Test that search accepts and processes hybrid search parameters"""
+        # Create test index
+        index_name = generate_unique_index_name("hybrid_search")
+        await simulate_mcp_call(
+            mcp_server, "create-index", {"uid": index_name, "primaryKey": "id"}
+        )
+
+        # Add test documents
+        documents = [
+            {
+                "id": 1,
+                "title": "Python Programming",
+                "description": "Learn Python basics",
+            },
+            {"id": 2, "title": "JavaScript Guide", "description": "Modern JS features"},
+            {"id": 3, "title": "Machine Learning", "description": "AI and ML concepts"},
+        ]
+        await simulate_mcp_call(
+            mcp_server,
+            "add-documents",
+            {"indexUid": index_name, "documents": documents},
+        )
+        await wait_for_indexing()
+
+        # Note: This test simulates the API call structure but won't actually
+        # perform semantic search without a configured embedder in Meilisearch
+
+        # Test search with hybrid parameters
+        search_params = {
+            "query": "programming",
+            "indexUid": index_name,
+            "hybrid": {"semanticRatio": 0.7, "embedder": "default"},
+            "limit": 5,
+        }
+
+        # The search should accept these parameters without error
+        response = await simulate_mcp_call(mcp_server, "search", search_params)
+        response_text = assert_text_content_response(response, "Search results")
+
+        # Even if embedder is not configured, the API should handle the request
+        assert "Search results for 'programming'" in response_text
+
+        # Cleanup
+        await simulate_mcp_call(mcp_server, "delete-index", {"uid": index_name})
+
+    @pytest.mark.skip(reason="Requires Meilisearch instance with embedders configured")
+    async def test_search_with_vector_parameter(self, mcp_server):
+        """Test that search accepts vector parameter"""
+        # Create test index
+        index_name = generate_unique_index_name("vector_search")
+        await simulate_mcp_call(
+            mcp_server, "create-index", {"uid": index_name, "primaryKey": "id"}
+        )
+
+        # Add test documents
+        documents = [{"id": 1, "content": "Test document"}]
+        await simulate_mcp_call(
+            mcp_server,
+            "add-documents",
+            {"indexUid": index_name, "documents": documents},
+        )
+        await wait_for_indexing()
+
+        # Test search with vector parameter
+        search_params = {
+            "query": "test",
+            "indexUid": index_name,
+            "vector": [0.1, 0.2, 0.3, 0.4, 0.5],
+            "retrieveVectors": True,
+        }
+
+        # The search should accept these parameters without error
+        response = await simulate_mcp_call(mcp_server, "search", search_params)
+        response_text = assert_text_content_response(response, "Search results")
+        assert "Search results for 'test'" in response_text
+
+        # Cleanup
+        await simulate_mcp_call(mcp_server, "delete-index", {"uid": index_name})
+
+    @pytest.mark.skip(reason="Requires Meilisearch instance with embedders configured")
+    async def test_search_semantic_only(self, mcp_server):
+        """Test semantic-only search with semanticRatio=1.0"""
+        # Create test index
+        index_name = generate_unique_index_name("semantic_only")
+        await simulate_mcp_call(
+            mcp_server, "create-index", {"uid": index_name, "primaryKey": "id"}
+        )
+
+        # Add test documents
+        documents = [
+            {"id": 1, "content": "Artificial intelligence and machine learning"}
+        ]
+        await simulate_mcp_call(
+            mcp_server,
+            "add-documents",
+            {"indexUid": index_name, "documents": documents},
+        )
+        await wait_for_indexing()
+
+        # Test semantic-only search
+        search_params = {
+            "query": "AI ML",
+            "indexUid": index_name,
+            "hybrid": {
+                "semanticRatio": 1.0,  # Pure semantic search
+                "embedder": "default",
+            },
+        }
+
+        response = await simulate_mcp_call(mcp_server, "search", search_params)
+        response_text = assert_text_content_response(response, "Search results")
+        assert "Search results for 'AI ML'" in response_text
+
+        # Cleanup
+        await simulate_mcp_call(mcp_server, "delete-index", {"uid": index_name})
+
+
 class TestIssue27OpenAISchemaCompatibility:
     """Test for issue #27 - Fix JSON schemas for OpenAI Agent SDK compatibility"""
 
