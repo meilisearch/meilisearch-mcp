@@ -226,6 +226,7 @@ Tests use `simulate_tool_call()` function that:
 - **Test Naming**: Use descriptive test method names (e.g., `test_create_index_with_primary_key`)
 - **Assertions**: Test both success cases and error handling
 - **Coverage**: New tools must have comprehensive test coverage
+- **Embedder Tests**: Tests requiring Meilisearch embedder configuration should be marked with `@pytest.mark.skip` decorator
 
 ## Environment Configuration
 
@@ -269,6 +270,8 @@ The repository includes Claude Code integration via GitHub Actions:
 ### Search Tool Features
 - **Flexible Targeting**: Search specific index or all indices
 - **Rich Parameters**: Filtering, sorting, pagination support
+- **Hybrid Search**: Support for combining keyword and semantic search with `semanticRatio` parameter
+- **Vector Search**: Custom vector support for semantic similarity search
 - **Result Formatting**: JSON formatted responses with proper serialization
 - **Error Resilience**: Graceful handling of index-specific failures
 
@@ -276,7 +279,7 @@ The repository includes Claude Code integration via GitHub Actions:
 
 ### Dependencies
 - **MCP Framework**: `mcp>=1.2.1` for protocol implementation
-- **Meilisearch Client**: `meilisearch>=0.33.0` for search engine integration
+- **Meilisearch Client**: `meilisearch>=0.34.0` for search engine integration with stable AI-powered search features
 - **HTTP Client**: `httpx>=0.24.0` for async HTTP operations
 - **Data Validation**: `pydantic>=2.0.0` for structured data handling
 
@@ -284,3 +287,10 @@ The repository includes Claude Code integration via GitHub Actions:
 - **Structured Logging**: JSON-formatted logs with contextual information
 - **Log Directory**: `~/.meilisearch-mcp/logs/` for persistent logging
 - **Error Tracking**: Comprehensive error logging with tool context
+
+### Hybrid Search Implementation
+- **Dependency**: Requires `meilisearch>=0.34.0` for stable AI-powered search features
+- **Parameters**: `hybrid` object with `semanticRatio` (0.0-1.0) and `embedder` (required)
+- **Vector Support**: Custom vectors can be provided via `vector` parameter
+- **Testing**: Hybrid search tests require embedder configuration in Meilisearch
+- **Backward Compatibility**: All hybrid search parameters are optional to maintain compatibility
