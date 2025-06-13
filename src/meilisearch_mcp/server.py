@@ -211,7 +211,7 @@ class MeilisearchMCPServer:
                 ),
                 types.Tool(
                     name="search",
-                    description="Search through Meilisearch indices. If indexUid is not provided, it will search across all indices.",
+                    description="Search through Meilisearch indices with support for hybrid search (combining keyword and semantic search). If indexUid is not provided, it will search across all indices.",
                     inputSchema={
                         "type": "object",
                         "properties": {
@@ -223,6 +223,32 @@ class MeilisearchMCPServer:
                             "sort": {
                                 "type": "array",
                                 "items": {"type": "string"},
+                            },
+                            "hybrid": {
+                                "type": "object",
+                                "properties": {
+                                    "semanticRatio": {
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "description": "Balance between keyword (0.0) and semantic (1.0) search",
+                                    },
+                                    "embedder": {
+                                        "type": "string",
+                                        "description": "Name of the configured embedder to use",
+                                    },
+                                },
+                                "required": ["embedder"],
+                                "additionalProperties": False,
+                            },
+                            "vector": {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "description": "Custom vector for semantic search",
+                            },
+                            "retrieveVectors": {
+                                "type": "boolean",
+                                "description": "Include vector data in search results",
                             },
                         },
                         "required": ["query"],
@@ -498,6 +524,9 @@ class MeilisearchMCPServer:
                         offset=arguments.get("offset"),
                         filter=arguments.get("filter"),
                         sort=arguments.get("sort"),
+                        hybrid=arguments.get("hybrid"),
+                        vector=arguments.get("vector"),
+                        retrieve_vectors=arguments.get("retrieveVectors"),
                     )
 
                     # Format the results for better readability
