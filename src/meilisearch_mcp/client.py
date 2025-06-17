@@ -56,6 +56,9 @@ class MeilisearchClient:
         offset: Optional[int] = 0,
         filter: Optional[str] = None,
         sort: Optional[List[str]] = None,
+        hybrid: Optional[Dict[str, Any]] = None,
+        vector: Optional[List[float]] = None,
+        retrieve_vectors: Optional[bool] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
@@ -74,6 +77,12 @@ class MeilisearchClient:
                 search_params["filter"] = filter
             if sort is not None:
                 search_params["sort"] = sort
+            if hybrid is not None:
+                search_params["hybrid"] = hybrid
+            if vector is not None:
+                search_params["vector"] = vector
+            if retrieve_vectors is not None:
+                search_params["retrieveVectors"] = retrieve_vectors
 
             # Add any additional parameters
             search_params.update({k: v for k, v in kwargs.items() if v is not None})
