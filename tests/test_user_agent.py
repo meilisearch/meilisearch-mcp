@@ -5,7 +5,11 @@ from src.meilisearch_mcp.__version__ import __version__
 
 
 def test_meilisearch_client_sets_custom_user_agent():
-    """Test that MeilisearchClient initializes with custom user agent"""
+    """
+    Verifies that MeilisearchClient sets a custom user agent string during initialization.
+    
+    This test ensures that the internal Client is instantiated with the correct URL, API key, and a client_agents tuple containing the package name and version.
+    """
     with patch("src.meilisearch_mcp.client.Client") as mock_client:
         # Create a MeilisearchClient instance
         client = MeilisearchClient(url="http://localhost:7700", api_key="test_key")
@@ -19,7 +23,11 @@ def test_meilisearch_client_sets_custom_user_agent():
 
 
 def test_user_agent_includes_correct_version():
-    """Test that the user agent includes the correct version from __version__.py"""
+    """
+    Verifies that MeilisearchClient sets the user agent to include the correct version string.
+    
+    This test ensures that the internal client is initialized with a user agent tuple containing the package name and the version string from the __version__ module.
+    """
     with patch("src.meilisearch_mcp.client.Client") as mock_client:
         client = MeilisearchClient()
 

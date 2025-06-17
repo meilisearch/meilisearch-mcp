@@ -18,7 +18,11 @@ class MeilisearchClient:
     def __init__(
         self, url: str = "http://localhost:7700", api_key: Optional[str] = None
     ):
-        """Initialize Meilisearch client"""
+        """
+        Initializes a MeilisearchClient instance for interacting with a Meilisearch server.
+        
+        Creates an internal client with a custom user agent and sets up managers for indexes, documents, settings, tasks, keys, and monitoring.
+        """
         self.url = url
         self.api_key = api_key
         # Add custom user agent to identify this as Meilisearch MCP
