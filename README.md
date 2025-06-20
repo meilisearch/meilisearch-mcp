@@ -141,7 +141,7 @@ uv pip install -e .
 
 Perfect for containerized environments like n8n workflows!
 
-#### From Docker Hub (Recommended)
+#### From Docker Hub
 
 ```bash
 # Pull the latest image
