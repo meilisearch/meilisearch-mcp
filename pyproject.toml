@@ -4,10 +4,10 @@ version = "0.5.0"
 description = "MCP server for Meilisearch"
 requires-python = ">=3.10"
 dependencies = [
-    "meilisearch>=0.33.0",
-    "mcp>=0.1.0",
-    "httpx>=0.24.0",
-    "pydantic>=2.0.0"
+    "meilisearch>=0.36.0",
+    "mcp>=1.12.1",
+    "httpx>=0.28.1",
+    "pydantic>=2.11.7",
 ]
 
 [build-system]

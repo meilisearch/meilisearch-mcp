@@ -12,16 +12,16 @@ jobs:
       version_changed: ${{ steps.check_version.outputs.version_changed }}
       current_version: ${{ steps.get_version.outputs.current_version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      
+
       - name: Get current version
         id: get_version
         run: |
           CURRENT_VERSION=$(grep "version = " pyproject.toml | cut -d'"' -f2)
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-      
+
       - name: Check if version changed
         id: check_version
         run: |
@@ -40,23 +40,23 @@ jobs:
       url: https://pypi.org/p/meilisearch-mcp
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
-    
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      
+
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
           pip install build
-      
+
       - name: Build package
         run: python -m build
-      
+
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -65,24 +65,24 @@ jobs:
 
   build-and-publish-docker-latest:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       - name: Build and push latest Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -95,28 +95,28 @@ jobs:
     needs: check-version
     if: needs.check-version.outputs.version_changed == 'true'
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       - name: Build and push versioned Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
           tags: getmeili/meilisearch-mcp:${{ needs.check-version.outputs.current_version }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max 
+          cache-to: type=gha,mode=max

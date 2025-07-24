@@ -9,9 +9,7 @@ class KeyManager:
     def __init__(self, client: Client):
         self.client = client
 
-    def get_keys(
-        self, parameters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+    def get_keys(self, parameters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Get list of API keys"""
         try:
             return self.client.get_keys(parameters)

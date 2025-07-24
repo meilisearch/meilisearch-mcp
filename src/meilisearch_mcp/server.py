@@ -408,9 +408,7 @@ class MeilisearchMCPServer:
                     ]
 
                 elif name == "delete-index":
-                    result = self.meili_client.indexes.delete_index(
-                        arguments["uid"]
-                    )
+                    result = self.meili_client.indexes.delete_index(arguments["uid"])
                     return [
                         types.TextContent(
                             type="text",

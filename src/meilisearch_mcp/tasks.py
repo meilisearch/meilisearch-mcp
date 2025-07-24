@@ -27,9 +27,7 @@ class TaskManager:
         except Exception as e:
             raise Exception(f"Failed to get task: {str(e)}")
 
-    def get_tasks(
-        self, parameters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+    def get_tasks(self, parameters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Get list of tasks with optional filters"""
         try:
             tasks = self.client.get_tasks(parameters)
