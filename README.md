@@ -110,6 +110,20 @@ AI: Searching across all indices... Found 47 results from 3 indices:
 - 'tutorials': 9 hands-on tutorials
 ```
 
+### 🤖 Chat Completions with RAG (v1.6+):
+
+```
+You: "Create a chat workspace for customer support with my products and FAQs indices"
+AI: I'll create that workspace... ✓ Chat workspace 'support-chat' created!
+
+You: "Using the support workspace, how do I return a defective product?"
+AI: Based on your FAQs and product policies, here's the return process...
+[Generates contextual response using indexed documents]
+
+You: "Generate a response about our warranty policy"
+AI: [Streams response] According to your documentation, the warranty covers...
+```
+
 ## 🔧 Installation
 
 ### Prerequisites
@@ -351,6 +365,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 #### Search
 - `search`: Flexible search across single or multiple indices with filtering and sorting options
+
+#### Chat Completions (Meilisearch v1.6+)
+- `chat-completion`: Generate chat responses with RAG using indexed documents as context (supports streaming)
+- `create-chat-workspace`: Create a chat workspace with default settings for consistent interactions
+- `update-chat-workspace`: Modify existing chat workspace configurations
+- `list-chat-workspaces`: List all available chat workspaces
+- `get-chat-workspace`: Get details of a specific chat workspace
+- `delete-chat-workspace`: Remove a chat workspace
 
 #### Settings Management
 - `get-settings`: View current settings for an index

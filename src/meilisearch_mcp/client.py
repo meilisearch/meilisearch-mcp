@@ -9,6 +9,7 @@ from .settings import SettingsManager
 from .keys import KeyManager
 from .logging import MCPLogger
 from .monitoring import MonitoringManager
+from .chat import ChatManager
 from .__version__ import __version__
 
 logger = MCPLogger()
@@ -31,6 +32,7 @@ class MeilisearchClient:
         self.tasks = TaskManager(self.client)
         self.keys = KeyManager(self.client)
         self.monitoring = MonitoringManager(self.client)
+        self.chat = ChatManager(self.client)
 
     def health_check(self) -> bool:
         """Check if Meilisearch is healthy"""
