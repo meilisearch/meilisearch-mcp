@@ -361,6 +361,175 @@ class MeilisearchMCPServer:
                         "additionalProperties": False,
                     },
                 ),
+                types.Tool(
+                    name="chat-completion",
+                    description="Generate a chat completion response using Meilisearch's chat feature with RAG",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "The user's query or prompt",
+                            },
+                            "model": {
+                                "type": "string",
+                                "description": "The model to use (e.g., 'gpt-4', 'gpt-3.5-turbo')",
+                            },
+                            "temperature": {
+                                "type": "number",
+                                "description": "Controls randomness (0-1)",
+                            },
+                            "maxTokens": {
+                                "type": "integer",
+                                "description": "Maximum tokens in response",
+                            },
+                            "indexUids": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "List of index UIDs to search for context",
+                            },
+                            "workspaceUid": {
+                                "type": "string",
+                                "description": "Chat workspace UID to use",
+                            },
+                            "stream": {
+                                "type": "boolean",
+                                "description": "Whether to stream the response",
+                                "default": True,
+                            },
+                        },
+                        "required": ["query"],
+                        "additionalProperties": False,
+                    },
+                ),
+                types.Tool(
+                    name="create-chat-workspace",
+                    description="Create a new chat workspace for managing chat settings",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "uid": {
+                                "type": "string",
+                                "description": "Unique identifier for the workspace",
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "Name of the workspace",
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Description of the workspace",
+                            },
+                            "model": {
+                                "type": "string",
+                                "description": "Default model for this workspace",
+                            },
+                            "temperature": {
+                                "type": "number",
+                                "description": "Default temperature for this workspace",
+                            },
+                            "maxTokens": {
+                                "type": "integer",
+                                "description": "Default max tokens for this workspace",
+                            },
+                            "indexUids": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "Default index UIDs for this workspace",
+                            },
+                        },
+                        "required": ["uid", "name"],
+                        "additionalProperties": False,
+                    },
+                ),
+                types.Tool(
+                    name="update-chat-workspace",
+                    description="Update an existing chat workspace",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "uid": {
+                                "type": "string",
+                                "description": "Unique identifier of the workspace to update",
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "New name for the workspace",
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "New description for the workspace",
+                            },
+                            "model": {
+                                "type": "string",
+                                "description": "New default model for this workspace",
+                            },
+                            "temperature": {
+                                "type": "number",
+                                "description": "New default temperature for this workspace",
+                            },
+                            "maxTokens": {
+                                "type": "integer",
+                                "description": "New default max tokens for this workspace",
+                            },
+                            "indexUids": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "New default index UIDs for this workspace",
+                            },
+                        },
+                        "required": ["uid"],
+                        "additionalProperties": False,
+                    },
+                ),
+                types.Tool(
+                    name="list-chat-workspaces",
+                    description="List all chat workspaces",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "limit": {
+                                "type": "integer",
+                                "description": "Maximum number of workspaces to return",
+                            },
+                            "offset": {
+                                "type": "integer",
+                                "description": "Number of workspaces to skip",
+                            },
+                        },
+                        "additionalProperties": False,
+                    },
+                ),
+                types.Tool(
+                    name="get-chat-workspace",
+                    description="Get details of a specific chat workspace",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "uid": {
+                                "type": "string",
+                                "description": "Unique identifier of the workspace",
+                            }
+                        },
+                        "required": ["uid"],
+                        "additionalProperties": False,
+                    },
+                ),
+                types.Tool(
+                    name="delete-chat-workspace",
+                    description="Delete a chat workspace",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "uid": {
+                                "type": "string",
+                                "description": "Unique identifier of the workspace to delete",
+                            }
+                        },
+                        "required": ["uid"],
+                        "additionalProperties": False,
+                    },
+                ),
             ]
 
         @self.server.call_tool()
@@ -408,9 +577,7 @@ class MeilisearchMCPServer:
                     ]
 
                 elif name == "delete-index":
-                    result = self.meili_client.indexes.delete_index(
-                        arguments["uid"]
-                    )
+                    result = self.meili_client.indexes.delete_index(arguments["uid"])
                     return [
                         types.TextContent(
                             type="text",
@@ -610,6 +777,133 @@ class MeilisearchMCPServer:
                     return [
                         types.TextContent(
                             type="text", text=f"System information: {info}"
+                        )
+                    ]
+
+                elif name == "chat-completion":
+                    stream = arguments.get("stream", True)
+
+                    if stream:
+                        # For streaming, we need to collect all chunks and return them
+                        response_chunks = []
+                        async for (
+                            chunk
+                        ) in self.meili_client.chat.chat_completion_stream(
+                            query=arguments["query"],
+                            model=arguments.get("model"),
+                            temperature=arguments.get("temperature"),
+                            max_tokens=arguments.get("maxTokens"),
+                            index_uids=arguments.get("indexUids"),
+                            workspace_uid=arguments.get("workspaceUid"),
+                        ):
+                            response_chunks.append(chunk)
+
+                        full_response = "".join(response_chunks)
+                        self.logger.info(
+                            "Chat completion streamed",
+                            query=arguments["query"],
+                            response_length=len(full_response),
+                        )
+                        return [types.TextContent(type="text", text=full_response)]
+                    else:
+                        # Non-streaming response
+                        response = self.meili_client.chat.chat_completion(
+                            query=arguments["query"],
+                            model=arguments.get("model"),
+                            temperature=arguments.get("temperature"),
+                            max_tokens=arguments.get("maxTokens"),
+                            index_uids=arguments.get("indexUids"),
+                            workspace_uid=arguments.get("workspaceUid"),
+                        )
+                        self.logger.info(
+                            "Chat completion generated", query=arguments["query"]
+                        )
+                        return [
+                            types.TextContent(
+                                type="text",
+                                text=json.dumps(
+                                    response, indent=2, default=json_serializer
+                                ),
+                            )
+                        ]
+
+                elif name == "create-chat-workspace":
+                    result = self.meili_client.chat.create_chat_workspace(
+                        uid=arguments["uid"],
+                        name=arguments["name"],
+                        description=arguments.get("description"),
+                        model=arguments.get("model"),
+                        temperature=arguments.get("temperature"),
+                        max_tokens=arguments.get("maxTokens"),
+                        index_uids=arguments.get("indexUids"),
+                    )
+                    self.logger.info(
+                        "Chat workspace created", workspace_uid=arguments["uid"]
+                    )
+                    return [
+                        types.TextContent(
+                            type="text",
+                            text=f"Chat workspace created: {json.dumps(result, indent=2, default=json_serializer)}",
+                        )
+                    ]
+
+                elif name == "update-chat-workspace":
+                    result = self.meili_client.chat.update_chat_workspace(
+                        uid=arguments["uid"],
+                        name=arguments.get("name"),
+                        description=arguments.get("description"),
+                        model=arguments.get("model"),
+                        temperature=arguments.get("temperature"),
+                        max_tokens=arguments.get("maxTokens"),
+                        index_uids=arguments.get("indexUids"),
+                    )
+                    self.logger.info(
+                        "Chat workspace updated", workspace_uid=arguments["uid"]
+                    )
+                    return [
+                        types.TextContent(
+                            type="text",
+                            text=f"Chat workspace updated: {json.dumps(result, indent=2, default=json_serializer)}",
+                        )
+                    ]
+
+                elif name == "list-chat-workspaces":
+                    result = self.meili_client.chat.list_chat_workspaces(
+                        limit=arguments.get("limit"), offset=arguments.get("offset")
+                    )
+                    self.logger.info("Chat workspaces listed")
+                    return [
+                        types.TextContent(
+                            type="text",
+                            text=f"Chat workspaces: {json.dumps(result, indent=2, default=json_serializer)}",
+                        )
+                    ]
+
+                elif name == "get-chat-workspace":
+                    result = self.meili_client.chat.get_chat_workspace(
+                        uid=arguments["uid"]
+                    )
+                    self.logger.info(
+                        "Chat workspace retrieved", workspace_uid=arguments["uid"]
+                    )
+                    return [
+                        types.TextContent(
+                            type="text",
+                            text=f"Chat workspace: {json.dumps(result, indent=2, default=json_serializer)}",
+                        )
+                    ]
+
+                elif name == "delete-chat-workspace":
+                    result = self.meili_client.chat.delete_chat_workspace(
+                        uid=arguments["uid"]
+                    )
+                    self.logger.info(
+                        "Chat workspace deleted", workspace_uid=arguments["uid"]
+                    )
+                    return [
+                        types.TextContent(
+                            type="text",
+                            text=f"Chat workspace deleted: {json.dumps(result, indent=2, default=json_serializer)}",
                         )
                     ]
 
