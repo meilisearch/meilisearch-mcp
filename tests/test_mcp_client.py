@@ -256,6 +256,12 @@ class TestMCPToolDiscovery:
             "get-health-status",
             "get-index-metrics",
             "get-system-info",
+            "chat-completion",
+            "create-chat-workspace",
+            "update-chat-workspace",
+            "list-chat-workspaces",
+            "get-chat-workspace",
+            "delete-chat-workspace",
         ]
 
         assert len(tools) == len(expected_tools)
