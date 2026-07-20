@@ -230,7 +230,10 @@ class MeilisearchMCPServer:
                             "hybrid": {
                                 "type": "object",
                                 "properties": {
-                                    "embedder": {"type": "string", "default": "default"},
+                                    "embedder": {
+                                        "type": "string",
+                                        "default": "default",
+                                    },
                                     "semanticRatio": {"type": "number"},
                                 },
                             },
