@@ -19,7 +19,6 @@ from unittest.mock import AsyncMock, patch
 from mcp.types import CallToolRequest, CallToolRequestParams, ListToolsRequest
 from src.meilisearch_mcp.server import MeilisearchMCPServer, create_server
 
-
 # Test configuration constants
 INDEXING_WAIT_TIME = 0.5
 TEST_URL = "http://localhost:7700"

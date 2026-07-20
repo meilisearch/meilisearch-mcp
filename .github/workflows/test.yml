@@ -12,7 +12,7 @@ jobs:
 
     services:
       meilisearch:
-        image: getmeili/meilisearch:v1.16
+        image: getmeili/meilisearch:v1.49
         ports:
           - 7700:7700
         env:
@@ -25,18 +25,17 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.10'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
-        pip install -e .
+        pip install -e ".[dev]"
 
     - name: Format code with black
       run: |

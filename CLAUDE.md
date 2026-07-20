@@ -113,7 +113,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 uv pip install -e .
 
 # Install development dependencies
-uv pip install -r requirements-dev.txt
+uv pip install -e ".[dev]"
 ```
 
 ### Testing (MANDATORY for all development)
@@ -148,7 +148,7 @@ npx @modelcontextprotocol/inspector python -m src.meilisearch_mcp
 
 ### Prerequisites for Testing
 - **Meilisearch server** must be running on `http://localhost:7700`
-- **Docker option**: `docker run -d -p 7700:7700 getmeili/meilisearch:v1.28`
+- **Docker option**: `docker run -d -p 7700:7700 getmeili/meilisearch:v1.49`
 - **Node.js** for MCP Inspector testing
 
 ## Architecture
@@ -278,10 +278,9 @@ The repository includes Claude Code integration via GitHub Actions:
 ## Development Notes
 
 ### Dependencies
-- **MCP Framework**: `mcp>=1.2.1` for protocol implementation
-- **Meilisearch Client**: `meilisearch>=0.34.0` for search engine integration with stable AI-powered search features
-- **HTTP Client**: `httpx>=0.24.0` for async HTTP operations
-- **Data Validation**: `pydantic>=2.0.0` for structured data handling
+- **MCP Framework**: `mcp>=1.28.0` for protocol implementation
+- **Meilisearch Client**: `meilisearch>=0.41.1` for search engine integration with stable AI-powered search features
+- **HTTP Client**: `httpx>=0.28.1` for async HTTP operations
 
 ### Logging Infrastructure
 - **Structured Logging**: JSON-formatted logs with contextual information
@@ -289,7 +288,7 @@ The repository includes Claude Code integration via GitHub Actions:
 - **Error Tracking**: Comprehensive error logging with tool context
 
 ### Hybrid Search Implementation
-- **Dependency**: Requires `meilisearch>=0.34.0` for stable AI-powered search features
+- **Dependency**: Requires `meilisearch>=0.41.1` for stable AI-powered search features
 - **Parameters**: `hybrid` object with `semanticRatio` (0.0-1.0) and `embedder` (required)
 - **Vector Support**: Custom vectors can be provided via `vector` parameter
 - **Testing**: Hybrid search tests require embedder configuration in Meilisearch
