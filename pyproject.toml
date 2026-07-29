@@ -1,11 +1,11 @@
 [project]
 name = "meilisearch-mcp"
-version = "0.6.0"
+version = "0.7.0"
 description = "MCP server for Meilisearch"
 requires-python = ">=3.10"
 dependencies = [
     "meilisearch>=0.38.0",
-    "mcp>=1.23.1",
+    "mcp>=2.0.0,<3",
     "httpx>=0.28.1",
     "pydantic>=2.12.5",
 ]
@@ -16,9 +16,6 @@ build-backend = "setuptools.build_meta"
 
 [project.scripts]
 meilisearch-mcp = "meilisearch_mcp.server:main"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/meilisearch_mcp"]
 
 [tool.pytest.ini_options]
 pythonpath = [

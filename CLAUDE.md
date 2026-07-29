@@ -167,19 +167,20 @@ MeilisearchClient
 ```
 
 ### MCP Server Integration
-- **Server Class**: `MeilisearchMCPServer` in `server.py` handles MCP protocol communication
-- **Tool Registration**: All tools are defined with JSON schemas for input validation
-- **Error Handling**: Comprehensive exception handling with logging through `MCPLogger`
+- **SDK**: Official MCP Python SDK v2 (`mcp>=2.0.0`), implementing the 2026-07-28 MCP specification while remaining compatible with clients on older protocol revisions
+- **Server Class**: `MeilisearchMCPServer` in `server.py` wraps an `MCPServer` instance and registers all tools in `_register_tools()`
+- **Tool Registration**: `@mcp.tool(name="...", annotations=...)` decorators; input schemas are inferred from Python type hints (with `additionalProperties: false` post-applied for OpenAI Agent SDK compatibility, issue #27)
+- **Error Handling**: Tools raise exceptions; the SDK converts them into `isError: true` tool results
 - **Dynamic Configuration**: Runtime connection settings updates via MCP tools
 
 ### Key Components
 
 #### Tool Handler Pattern
 All MCP tools follow a consistent pattern:
-1. Input validation via JSON schema
+1. Input validation from type-hint-inferred schemas (handled by the SDK)
 2. Delegation to appropriate manager class
-3. Error handling with structured logging
-4. Formatted response as `TextContent`
+3. Response built with `_result(text, data)`: legacy prose `TextContent` plus additive `structuredContent`
+4. Tool annotations declare read-only/destructive hints per tool
 
 #### Search Architecture
 - **Single Index Search**: Direct search in specified index
@@ -200,7 +201,7 @@ All MCP tools follow a consistent pattern:
 ### Test Categories by Development Task
 
 #### When Tests are REQUIRED:
-- **New MCP Tools**: Add tests to `test_mcp_client.py` using `simulate_tool_call()`
+- **New MCP Tools**: Add tests to `test_mcp_client.py` using the `mcp_client` fixture (real MCP client over in-memory transport)
 - **Existing Tool Changes**: Update corresponding test methods
 - **Manager Class Changes**: Test through MCP tool integration
 - **Bug Fixes**: Add regression tests to prevent reoccurrence
@@ -211,13 +212,11 @@ All MCP tools follow a consistent pattern:
 - **Code Formatting**: Black formatting, comment changes
 - **Minor Refactoring**: Internal reorganization without behavior changes
 
-### Tool Simulation Framework
-Tests use `simulate_tool_call()` function that:
-- Directly invokes server tool handlers
-- Bypasses MCP protocol overhead
-- Returns proper `TextContent` responses
-- Provides comprehensive coverage of all 20+ tools
-- Enables fast test execution without MCP protocol complexity
+### Test Harness
+Tests drive the server with a **real MCP client**:
+- `mcp_client` fixture (`InMemoryToolClient`) connects the SDK's `Client` to the server over the in-memory transport and returns `CallToolResult` objects (`result.content`, `result.structured_content`, `result.is_error`)
+- `tests/test_stdio_e2e.py` spawns the server as a subprocess and runs a full CRUD round-trip over the actual stdio transport — the same path Claude Desktop uses
+- Provides comprehensive coverage of all 26 tools
 
 ### Test Isolation and Best Practices
 - **Unique Index Names**: Timestamped index names prevent test interference
@@ -278,7 +277,7 @@ The repository includes Claude Code integration via GitHub Actions:
 ## Development Notes
 
 ### Dependencies
-- **MCP Framework**: `mcp>=1.2.1` for protocol implementation
+- **MCP Framework**: `mcp>=2.0.0,<3` (official Python SDK v2, spec 2026-07-28) for protocol implementation
 - **Meilisearch Client**: `meilisearch>=0.34.0` for search engine integration with stable AI-powered search features
 - **HTTP Client**: `httpx>=0.24.0` for async HTTP operations
 - **Data Validation**: `pydantic>=2.0.0` for structured data handling

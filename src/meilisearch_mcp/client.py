@@ -1,4 +1,4 @@
-import httpx
+import logging
 from meilisearch import Client
 from typing import Optional, Dict, Any, List
 
@@ -7,11 +7,10 @@ from .documents import DocumentManager
 from .tasks import TaskManager
 from .settings import SettingsManager
 from .keys import KeyManager
-from .logging import MCPLogger
 from .monitoring import MonitoringManager
 from .__version__ import __version__
 
-logger = MCPLogger()
+logger = logging.getLogger(__name__)
 
 
 class MeilisearchClient:

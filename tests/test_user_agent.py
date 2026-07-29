@@ -29,5 +29,4 @@ def test_user_agent_includes_correct_version():
 
         # Verify format and version
         assert client_agents[0] == "meilisearch-mcp"
-        assert client_agents[1] == "v0.5.0"
         assert client_agents[1] == f"v{__version__}"

@@ -41,6 +41,8 @@ The Meilisearch MCP Server is a Model Context Protocol server that enables any M
 - 📈 **Task Monitoring** - Track indexing progress and system operations
 - 🔐 **API Key Management** - Secure access control
 - 🏥 **Health Monitoring** - Keep tabs on your Meilisearch instance
+- 🧱 **Structured Tool Output** - Every data-returning tool provides `structuredContent` alongside text, per the latest MCP specification
+- 🔀 **Modern MCP Stack** - Built on the official MCP Python SDK v2 (spec 2026-07-28), backwards compatible with older MCP clients
 - 🐍 **Python Implementation** - [TypeScript version also available](https://github.com/devlimelabs/meilisearch-ts-mcp)
 
 ## 🚀 Quick Start
@@ -114,7 +116,7 @@ AI: Searching across all indices... Found 47 results from 3 indices:
 
 ### Prerequisites
 
-- Python ≥ 3.9
+- Python ≥ 3.10
 - Running Meilisearch instance
 - MCP-compatible client (Claude Desktop, OpenAI agents, etc.)
 
@@ -367,7 +369,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - `get-task`: Get information about a specific task
 - `get-tasks`: List tasks with optional filters
 - `cancel-tasks`: Cancel pending or enqueued tasks
-- `delete-tasks`: Delete completed tasks
 
 #### System Monitoring
 - `health-check`: Basic health check
