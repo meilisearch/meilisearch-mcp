@@ -1,11 +1,10 @@
+import logging
 from typing import Any, Dict, Iterator, List, Optional
 
 from meilisearch import Client
 from meilisearch.errors import MeilisearchApiError
 
-from .logging import MCPLogger
-
-logger = MCPLogger()
+logger = logging.getLogger(__name__)
 
 
 class ChatManager:
