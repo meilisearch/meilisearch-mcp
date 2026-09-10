@@ -261,6 +261,7 @@ class TestMCPToolDiscovery:
             "get-chat-workspaces",
             "get-chat-workspace-settings",
             "update-chat-workspace-settings",
+            "youcom-search",
         ]
 
         assert set(tool_names) == set(expected_tools)

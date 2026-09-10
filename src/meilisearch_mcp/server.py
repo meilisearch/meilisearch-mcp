@@ -12,6 +12,7 @@ from mcp.types import CallToolResult, TextContent, ToolAnnotations
 from .client import MeilisearchClient
 from .chat import ChatManager
 from .__version__ import __version__
+from .youcom import YouComSearchClient, format_youcom_results, YouComSearchError
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,7 @@ class MeilisearchMCPServer:
         self.api_key = api_key
         self.meili_client = MeilisearchClient(url, api_key)
         self.chat_manager = ChatManager(self.meili_client.client)
+        self.youcom_client = YouComSearchClient()
         self.mcp = MCPServer("meilisearch", version=__version__)
         self._register_tools()
 
@@ -401,6 +403,19 @@ class MeilisearchMCPServer:
                 f"Updated workspace settings for '{workspace_uid}':\n{formatted_json}",
                 updated_settings,
             )
+
+        @mcp.tool(name="youcom-search", annotations=READ_ONLY)
+        def youcom_search(query: str, count: int = 5) -> CallToolResult:
+            """Optional You.com web search for external context. Requires YDC_API_KEY."""
+            if not self.youcom_client.is_enabled():
+                return _result(
+                    "You.com search is disabled: set YDC_API_KEY to enable it."
+                )
+            try:
+                payload = self.youcom_client.search(query, count)
+                return _result(format_youcom_results(payload, query), payload)
+            except YouComSearchError as e:
+                return _result(str(e))
 
         # Keep additionalProperties: false on all schemas for OpenAI Agent SDK
         # compatibility (issue #27). ponytail: reaches into the private tool
