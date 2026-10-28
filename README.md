@@ -19,6 +19,15 @@
   <a href="https://pypi.org/project/meilisearch-mcp/"><img src="https://img.shields.io/pypi/dm/meilisearch-mcp" alt="Downloads"></a>
 </p>
 
+> [!WARNING]
+> **This package is deprecated. Use the native Meilisearch MCP server instead.**
+>
+> Meilisearch now ships a built-in MCP server (Meilisearch v1.54 and later). It is exposed on the `/mcp` route of your instance over HTTP, so you do not need to install or run this Python package anymore.
+>
+> 👉 Follow the [Meilisearch MCP guide](https://www.meilisearch.com/docs/getting_started/integrations/mcp) to set it up.
+>
+> This repository is a local stdio wrapper built before native support existed. It is no longer actively maintained and is kept only for existing users.
+
 <p align="center">⚡ Connect any LLM to Meilisearch and supercharge your AI with lightning-fast search capabilities! 🔍</p>
 
 ## 🤔 What is this?
@@ -31,7 +40,7 @@ The Meilisearch MCP Server is a Model Context Protocol server that enables any M
 - 🚀 **Zero Learning Curve** - No need to learn Meilisearch's API
 - 🔧 **Full Feature Access** - All Meilisearch capabilities at your fingertips
 - 🔄 **Dynamic Connections** - Switch between Meilisearch instances on the fly
-- 📡 **stdio Transport** - Currently uses stdio; native Meilisearch MCP support coming soon!
+- 📡 **stdio Transport** - Uses stdio only; for HTTP, use the [native Meilisearch MCP server](https://www.meilisearch.com/docs/getting_started/integrations/mcp)
 
 ## ✨ Key Features
 
